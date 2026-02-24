@@ -8,6 +8,11 @@ import Venues from './pages/Venues';
 import Cameras from './pages/Cameras';
 import Alerts from './pages/Alerts';
 import Analytics from './pages/Analytics';
+
+// ✅ ADDED
+import Users from './pages/Users';
+import Settings from './pages/Settings';
+
 import { wsService } from './services/websocket';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -46,9 +51,10 @@ const AppRoutes: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Connect to WebSocket for real-time updates
+      // ⚠️ OPTIONAL FIX (important for deployment)
+      // Replace localhost with your deployed backend later
       wsService.connect('ws://localhost:3002');
-      
+
       return () => {
         wsService.disconnect();
       };
@@ -57,25 +63,37 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={
-        <PublicRoute>
-          <LoginForm />
-        </PublicRoute>
-      } />
-      
-      <Route path="/" element={
-        <ProtectedRoute>
-          <Layout />
-        </ProtectedRoute>
-      }>
+      {/* Public Route */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginForm />
+          </PublicRoute>
+        }
+      />
+
+      {/* Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="venues" element={<Venues />} />
         <Route path="cameras" element={<Cameras />} />
         <Route path="alerts" element={<Alerts />} />
         <Route path="analytics" element={<Analytics />} />
+
+        {/* ✅ FIXED: Added missing routes */}
+        <Route path="users" element={<Users />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
-      </Routes>
+    </Routes>
   );
 };
 
